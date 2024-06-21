@@ -52,10 +52,9 @@ android {
 }
 
 dependencies {
-    implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("com.lorentzos.swipecards:library:1.0.9")
     implementation ("org.jetbrains.kotlin:kotlin-stdlib")
     implementation("com.google.code.gson:gson:2.10")
-    implementation ("androidx.appcompat:appcompat:1.7.0")
     implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation ("com.google.android.material:material:1.12.0")
     implementation("androidx.core:core-ktx:1.13.1")

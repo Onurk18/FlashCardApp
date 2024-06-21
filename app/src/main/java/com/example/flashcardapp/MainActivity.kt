@@ -1,37 +1,59 @@
-package com.example.flashcardapp
+package com.example.cardapp
 
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.flashcardapp.databinding.ActivityMainBinding
+import com.example.flashcardapp.R
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import java.io.InputStreamReader
+import com.lorentzos.flingswipe.SwipeFlingAdapterView
+import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
-    private lateinit var flashCards: List<FlashCard>
-    data class FlashCard(val english: String, val turkish: String)
-
+    private lateinit var words: MutableList<Word>
+    private lateinit var adapter: CardsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_main)
 
-        flashCards = loadFlashCards()
-        setupViewPager()
+        words = loadWords().toMutableList()
+
+        adapter = CardsAdapter(this, words)
+        val frame = findViewById<SwipeFlingAdapterView>(R.id.frame)
+        frame.adapter = adapter
+
+        frame.setFlingListener(object : SwipeFlingAdapterView.onFlingListener {
+            override fun removeFirstObjectInAdapter() {
+                if (words.isNotEmpty()) {
+                    words.removeAt(0)
+                    adapter.notifyDataSetChanged()
+                }
+            }
+
+            override fun onLeftCardExit(dataObject: Any) {}
+            override fun onRightCardExit(dataObject: Any) {}
+            override fun onAdapterAboutToEmpty(itemsInAdapter: Int) {}
+            override fun onScroll(scrollProgressPercent: Float) {}
+        })
+
+        frame.setOnItemClickListener { _, _ ->
+            val word = words[0]
+            val tvWord = findViewById<TextView>(R.id.tvWord)
+            tvWord.text = if (tvWord.text == word.english) word.turkish else word.english
+        }
     }
 
-    private fun loadFlashCards(): List<FlashCard> {
-        val inputStream = resources.openRawResource(R.raw.words)
-        val reader = InputStreamReader(inputStream)
-        val flashCardType = object : TypeToken<List<FlashCard>>() {}.type
-        return Gson().fromJson(reader, flashCardType)
-    }
-
-    private fun setupViewPager() {
-        val adapter = FlashCardAdapter(this, flashCards)
-        binding.viewPager.adapter = adapter
+    private fun loadWords(): List<Word> {
+        val jsonString: String
+        try {
+            jsonString = assets.open("words.json").bufferedReader().use { it.readText() }
+        } catch (ioException: IOException) {
+            ioException.printStackTrace()
+            return emptyList()
+        }
+        val listType = object : TypeToken<List<Word>>() {}.type
+        return Gson().fromJson(jsonString, listType)
     }
 }

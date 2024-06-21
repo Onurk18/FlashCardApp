@@ -1,4 +1,4 @@
-package com.example.cardapp
+package com.example.flashcardapp
 
 import android.os.Bundle
 import android.widget.TextView

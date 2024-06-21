@@ -1,4 +1,4 @@
-package com.example.cardapp
+package com.example.flashcardapp
 
 data class Word(
     val english: String,

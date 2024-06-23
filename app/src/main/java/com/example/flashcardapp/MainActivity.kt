@@ -3,7 +3,6 @@ package com.example.flashcardapp
 import android.os.Bundle
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import com.example.flashcardapp.R
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.lorentzos.flingswipe.SwipeFlingAdapterView
@@ -39,8 +38,9 @@ class MainActivity : AppCompatActivity() {
         })
 
         frame.setOnItemClickListener { _, _ ->
+            val topView = frame.getSelectedView()
+            val tvWord = topView.findViewById<TextView>(R.id.tvWord)
             val word = words[0]
-            val tvWord = findViewById<TextView>(R.id.tvWord)
             tvWord.text = if (tvWord.text == word.english) word.turkish else word.english
         }
     }

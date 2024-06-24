@@ -13,15 +13,16 @@ class MainMenuActivity : AppCompatActivity() {
 
         val flashcardsButton = findViewById<Button>(R.id.btnFlashcards)
         val quizButton = findViewById<Button>(R.id.btnQuiz)
-        val settingsButton = findViewById<Button>(R.id.btnSettings)
+        val cardsButton = findViewById<Button>(R.id.btnCards)
 
         flashcardsButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
 
-        settingsButton.setOnClickListener {
-            // settings activity'yi başlat
+        cardsButton.setOnClickListener {
+            val intent = Intent(this, CardsActivity::class.java)
+            startActivity(intent)
         }
 
         quizButton.setOnClickListener {

@@ -19,10 +19,10 @@
         android:text="Quiz"/>
 
     <Button
-        android:id="@+id/btnSettings"
+        android:id="@+id/btnCards"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Settings" />
+        android:text="Cards" />
 
 
 

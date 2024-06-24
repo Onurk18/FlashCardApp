@@ -39,12 +39,12 @@ class MainActivity : AppCompatActivity() {
             override fun onLeftCardExit(dataObject: Any) {
                 val word = dataObject as Word
                 word.learningLevel = 1  // Not learned
-                saveWord(word)
+                saveWord(filesDir, word)
             }
             override fun onRightCardExit(dataObject: Any) {
                 val word = dataObject as Word
                 word.learningLevel = 2  //  learned
-                saveWord(word)
+                saveWord(filesDir, word)
             }
             override fun onAdapterAboutToEmpty(itemsInAdapter: Int) {}
             override fun onScroll(scrollProgressPercent: Float) {}
@@ -87,27 +87,29 @@ class MainActivity : AppCompatActivity() {
         val listType = object : TypeToken<List<Word>>() {}.type
         return Gson().fromJson<List<Word>?>(jsonString, listType).filter { it.learningLevel == 0 ||it.learningLevel == 1 }
     }
-    private fun saveWord(word: Word) {
-        try {
-            // Tüm kelimeleri oku
-            val jsonString: String
-            val file = File(filesDir, "words.json")
-            jsonString = file.bufferedReader().use { it.readText() }
+    companion object {
+        fun saveWord(fileDir: File, word: Word) {
+            try {
+                // Tüm kelimeleri oku
+                val jsonString: String
+                val file = File(fileDir, "words.json")
+                jsonString = file.bufferedReader().use { it.readText() }
 
-            val listType = object : TypeToken<MutableList<Word>>() {}.type
-            val wordList: MutableList<Word> = Gson().fromJson(jsonString, listType)
+                val listType = object : TypeToken<MutableList<Word>>() {}.type
+                val wordList: MutableList<Word> = Gson().fromJson(jsonString, listType)
 
-            // İlgili kelimeyi güncelle
-            val index = wordList.indexOfFirst { it.english == word.english }
-            if (index != -1) {
-                wordList[index] = word
+                // İlgili kelimeyi güncelle
+                val index = wordList.indexOfFirst { it.english == word.english }
+                if (index != -1) {
+                    wordList[index] = word
+                }
+
+                // Güncellenmiş listeyi dosyaya yaz
+                val updatedJsonString = Gson().toJson(wordList)
+                FileWriter(file).use { it.write(updatedJsonString) }
+            } catch (ioException: IOException) {
+                ioException.printStackTrace()
             }
-
-            // Güncellenmiş listeyi dosyaya yaz
-            val updatedJsonString = Gson().toJson(wordList)
-            FileWriter(file).use { it.write(updatedJsonString) }
-        } catch (ioException: IOException) {
-            ioException.printStackTrace()
         }
     }
 }

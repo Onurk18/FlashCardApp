@@ -20,6 +20,12 @@ class QuizActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
 
         words = loadWords()
+        if (words.size<4) {
+            Toast.makeText(this, "You need to learn before quiz", Toast.LENGTH_SHORT).show()
+            finish()
+            return
+        }
+
 
 
         val tvQuestion = findViewById<TextView>(R.id.tvQuestion)
@@ -45,8 +51,9 @@ class QuizActivity : AppCompatActivity() {
                 if (selectedText == correctWord.turkish) {
                     Toast.makeText(this, "Correct!", Toast.LENGTH_SHORT).show()
                 } else {
-
-                    Toast.makeText(this, "Wrong! Correct answer is ${correctWord.turkish}", Toast.LENGTH_SHORT).show()
+                    correctWord.learningLevel = 1
+                    MainActivity.saveWord(filesDir, correctWord)
+                    Toast.makeText(this, "Wrong! Correct answer is ${correctWord.turkish}, Practice with flash Cards", Toast.LENGTH_SHORT).show()
                 }
                 generateQuestion()
                 tvQuestion.text = "What is the Turkish meaning of '${correctWord.english}'?"
@@ -63,7 +70,7 @@ class QuizActivity : AppCompatActivity() {
     }
 
     private fun generateQuestion() {
-        val randomIndex = (0 until words.size).random()
+        val randomIndex = words.indices.random()
         correctWord = words[randomIndex]
 
         options = mutableListOf(correctWord.turkish)
@@ -78,12 +85,12 @@ class QuizActivity : AppCompatActivity() {
 
     private fun loadWords(): List<Word> {
         val jsonString: String
-                try {
-                    jsonString = File(filesDir, "words.json").bufferedReader().use { it.readText() }
-                } catch (ioException: IOException) {
-                    ioException.printStackTrace()
-                    return emptyList()
-                }
+        try {
+            jsonString = File(filesDir, "words.json").bufferedReader().use { it.readText() }
+        } catch (ioException: IOException) {
+            ioException.printStackTrace()
+            return emptyList()
+        }
         val listType = object : TypeToken<List<Word>>() {}.type
         return Gson().fromJson<List<Word>?>(jsonString, listType).filter { it.learningLevel == 2 }
     }

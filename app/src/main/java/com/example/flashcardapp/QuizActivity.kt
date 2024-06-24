@@ -5,7 +5,9 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import java.io.File
 import java.io.IOException
+
 
 class QuizActivity : AppCompatActivity() {
 
@@ -18,6 +20,7 @@ class QuizActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
 
         words = loadWords()
+
 
         val tvQuestion = findViewById<TextView>(R.id.tvQuestion)
         val rgOptions = findViewById<RadioGroup>(R.id.rgOptions)
@@ -42,6 +45,7 @@ class QuizActivity : AppCompatActivity() {
                 if (selectedText == correctWord.turkish) {
                     Toast.makeText(this, "Correct!", Toast.LENGTH_SHORT).show()
                 } else {
+
                     Toast.makeText(this, "Wrong! Correct answer is ${correctWord.turkish}", Toast.LENGTH_SHORT).show()
                 }
                 generateQuestion()
@@ -74,13 +78,13 @@ class QuizActivity : AppCompatActivity() {
 
     private fun loadWords(): List<Word> {
         val jsonString: String
-        try {
-            jsonString = assets.open("words.json").bufferedReader().use { it.readText() }
-        } catch (ioException: IOException) {
-            ioException.printStackTrace()
-            return emptyList()
-        }
+                try {
+                    jsonString = File(filesDir, "words.json").bufferedReader().use { it.readText() }
+                } catch (ioException: IOException) {
+                    ioException.printStackTrace()
+                    return emptyList()
+                }
         val listType = object : TypeToken<List<Word>>() {}.type
-        return Gson().fromJson(jsonString, listType)
+        return Gson().fromJson<List<Word>?>(jsonString, listType).filter { it.learningLevel == 2 }
     }
 }

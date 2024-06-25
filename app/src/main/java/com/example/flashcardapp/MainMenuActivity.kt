@@ -37,20 +37,17 @@ class MainMenuActivity : AppCompatActivity() {
         }
 
         resetButton.setOnClickListener {
-            // Burada tüm kelimelerin learningLevel değerini 0 yapacak bir fonksiyon çağırılabilir.
             resetLearnedWords()
         }
     }
 
     private fun resetLearnedWords() {
-        // words.json dosyasındaki tüm kelimelerin learningLevel değerini 0 yap
         val words = loadWords()
         words.forEach { it.learningLevel = 0 }
         saveWords(words)
     }
 
     private fun loadWords(): List<Word> {
-        // words.json dosyasından kelimeleri yükle
         val jsonString: String
         try {
             jsonString = assets.open("words.json").bufferedReader().use { it.readText() }
@@ -63,7 +60,6 @@ class MainMenuActivity : AppCompatActivity() {
     }
 
     private fun saveWords(words: List<Word>) {
-        // Tüm kelimeleri güncel JSON olarak kaydet
         val file = File(filesDir, "words.json")
         val updatedJsonString = Gson().toJson(words)
         FileWriter(file).use { it.write(updatedJsonString) }

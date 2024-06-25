@@ -10,6 +10,7 @@ import com.lorentzos.flingswipe.SwipeFlingAdapterView
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
+import kotlin.math.abs
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         ivCheck = findViewById(R.id.ivCheck)
 
         frame.setFlingListener(object : SwipeFlingAdapterView.onFlingListener {
+            //Remove word from list until list is empty
             override fun removeFirstObjectInAdapter() {
                 if (words.isNotEmpty()) {
                     words.removeAt(0)
@@ -53,8 +55,10 @@ class MainActivity : AppCompatActivity() {
                 saveWord(filesDir, word)
             }
             override fun onAdapterAboutToEmpty(itemsInAdapter: Int) {}
+
+            //Learn or repeat
             override fun onScroll(scrollProgressPercent: Float) {
-                val alpha = Math.abs(scrollProgressPercent)
+                val alpha = abs(scrollProgressPercent)
                 if (scrollProgressPercent < 0) {
                     ivReturn.alpha = alpha
                     ivCheck.alpha = 0f
@@ -65,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             }
 
         })
-
+        //Click and change the word
         frame.setOnItemClickListener { _, _ ->
             val topView = frame.selectedView
             val tvWord = topView.findViewById<TextView>(R.id.tvWord)
@@ -74,12 +78,14 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+    //if deck is finished reload
     private fun reloadWords() {
         words.clear()
         words.addAll(loadWords())
         words.shuffle(Random(System.currentTimeMillis()))
         adapter.notifyDataSetChanged()
     }
+    //Transfer to FilesDir from assets
     private fun copyAssets() {
         val assetManager = assets
         val files = assetManager.list("") ?: return
@@ -97,7 +103,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
+    //Load json file from filesdir and create a Word list
     private fun loadWords(): List<Word> {
         val jsonString: String
         try {
@@ -112,7 +118,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         fun saveWord(fileDir: File, word: Word) {
             try {
-                // Tüm kelimeleri oku
+                // Read all words
                 val jsonString: String
                 val file = File(fileDir, "words.json")
                 jsonString = file.bufferedReader().use { it.readText() }
@@ -120,13 +126,13 @@ class MainActivity : AppCompatActivity() {
                 val listType = object : TypeToken<MutableList<Word>>() {}.type
                 val wordList: MutableList<Word> = Gson().fromJson(jsonString, listType)
 
-                // İlgili kelimeyi güncelle
+                // change word
                 val index = wordList.indexOfFirst { it.english == word.english }
                 if (index != -1) {
                     wordList[index] = word
                 }
 
-                // Güncellenmiş listeyi dosyaya yaz
+                // update json
                 val updatedJsonString = Gson().toJson(wordList)
                 FileWriter(file).use { it.write(updatedJsonString) }
             } catch (ioException: IOException) {

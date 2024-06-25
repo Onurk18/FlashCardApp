@@ -8,22 +8,28 @@
 
     <Button
         android:id="@+id/btnFlashcards"
-        android:layout_width="wrap_content"
+        android:layout_width="125dp"
         android:layout_height="wrap_content"
         android:text="Flashcards" />
+
     <Button
         android:id="@+id/btnQuiz"
-        android:layout_width="wrap_content"
+        android:layout_width="125dp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Quiz"/>
+        android:text="Quiz" />
 
     <Button
         android:id="@+id/btnCards"
-        android:layout_width="wrap_content"
+        android:layout_width="125dp"
         android:layout_height="wrap_content"
         android:text="Cards" />
-
+    <Button
+        android:id="@+id/btnResetLearnedWords"
+        android:layout_width="125dp"
+        android:layout_height="wrap_content"
+        android:text="Reset Learned Words"
+        android:layout_marginTop="16dp" />
 
 
 </LinearLayout>

@@ -8,7 +8,6 @@ import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.io.IOException
 
-
 class QuizActivity : AppCompatActivity() {
 
     private lateinit var words: List<Word>
@@ -20,53 +19,32 @@ class QuizActivity : AppCompatActivity() {
         setContentView(R.layout.activity_quiz)
 
         words = loadWords()
-        if (words.size<4) {
-            Toast.makeText(this, "You need to learn before quiz", Toast.LENGTH_SHORT).show()
+
+        if (words.size < 4) {
+            Toast.makeText(this, "You need to learn more words before taking the quiz.", Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
-
-
         val tvQuestion = findViewById<TextView>(R.id.tvQuestion)
-        val rgOptions = findViewById<RadioGroup>(R.id.rgOptions)
-        val btnSubmit = findViewById<Button>(R.id.btnSubmit)
+        val btnOption1 = findViewById<Button>(R.id.btnOption1)
+        val btnOption2 = findViewById<Button>(R.id.btnOption2)
+        val btnOption3 = findViewById<Button>(R.id.btnOption3)
+        val btnOption4 = findViewById<Button>(R.id.btnOption4)
 
         generateQuestion()
 
         tvQuestion.text = "What is the Turkish meaning of '${correctWord.english}'?"
 
-        rgOptions.removeAllViews()
-        options.forEach { option ->
-            val radioButton = RadioButton(this)
-            radioButton.text = option
-            rgOptions.addView(radioButton)
-        }
+        setOptionText(btnOption1, options[0])
+        setOptionText(btnOption2, options[1])
+        setOptionText(btnOption3, options[2])
+        setOptionText(btnOption4, options[3])
 
-        btnSubmit.setOnClickListener {
-            val selectedOption = rgOptions.checkedRadioButtonId
-            if (selectedOption != -1) {
-                val selectedRadioButton = findViewById<RadioButton>(selectedOption)
-                val selectedText = selectedRadioButton.text
-                if (selectedText == correctWord.turkish) {
-                    Toast.makeText(this, "Correct!", Toast.LENGTH_SHORT).show()
-                } else {
-                    correctWord.learningLevel = 1
-                    MainActivity.saveWord(filesDir, correctWord)
-                    Toast.makeText(this, "Wrong! Correct answer is ${correctWord.turkish}, Practice with flash Cards", Toast.LENGTH_SHORT).show()
-                }
-                generateQuestion()
-                tvQuestion.text = "What is the Turkish meaning of '${correctWord.english}'?"
-                rgOptions.removeAllViews()
-                options.forEach { option ->
-                    val radioButton = RadioButton(this)
-                    radioButton.text = option
-                    rgOptions.addView(radioButton)
-                }
-            } else {
-                Toast.makeText(this, "Please select an option", Toast.LENGTH_SHORT).show()
-            }
-        }
+        btnOption1.setOnClickListener { checkAnswer(btnOption1.text.toString()) }
+        btnOption2.setOnClickListener { checkAnswer(btnOption2.text.toString()) }
+        btnOption3.setOnClickListener { checkAnswer(btnOption3.text.toString()) }
+        btnOption4.setOnClickListener { checkAnswer(btnOption4.text.toString()) }
     }
 
     private fun generateQuestion() {
@@ -93,5 +71,30 @@ class QuizActivity : AppCompatActivity() {
         }
         val listType = object : TypeToken<List<Word>>() {}.type
         return Gson().fromJson<List<Word>?>(jsonString, listType).filter { it.learningLevel == 2 }
+    }
+
+    private fun setOptionText(button: Button, text: String) {
+        button.text = text
+    }
+
+    private fun checkAnswer(selectedText: String) {
+        if (selectedText == correctWord.turkish) {
+            Toast.makeText(this, "Correct!", Toast.LENGTH_SHORT).show()
+        } else {
+            correctWord.learningLevel = 1
+            MainActivity.saveWord(filesDir, correctWord)
+            Toast.makeText(this, "Wrong! Correct answer is ${correctWord.turkish}. Practice with Flash Cards.", Toast.LENGTH_SHORT).show()
+        }
+        generateQuestion()
+        val tvQuestion = findViewById<TextView>(R.id.tvQuestion)
+        tvQuestion.text = "What is the Turkish meaning of '${correctWord.english}'?"
+        val btnOption1 = findViewById<Button>(R.id.btnOption1)
+        val btnOption2 = findViewById<Button>(R.id.btnOption2)
+        val btnOption3 = findViewById<Button>(R.id.btnOption3)
+        val btnOption4 = findViewById<Button>(R.id.btnOption4)
+        setOptionText(btnOption1, options[0])
+        setOptionText(btnOption2, options[1])
+        setOptionText(btnOption3, options[2])
+        setOptionText(btnOption4, options[3])
     }
 }

@@ -27,7 +27,8 @@ class CardsActivity : AppCompatActivity() {
         for (word in words) {
             if (word.learningLevel == 2) {
                 learnedWords.add(word.english + " - " + word.turkish)
-            } else {
+            }
+            if(word.learningLevel==1) {
                 notLearnedWords.add(word.english + " - " + word.turkish)
             }
         }

@@ -4,6 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.io.File
+import java.io.FileWriter
+import java.io.IOException
 
 class MainMenuActivity : AppCompatActivity() {
 
@@ -14,6 +19,7 @@ class MainMenuActivity : AppCompatActivity() {
         val flashcardsButton = findViewById<Button>(R.id.btnFlashcards)
         val quizButton = findViewById<Button>(R.id.btnQuiz)
         val cardsButton = findViewById<Button>(R.id.btnCards)
+        val resetButton = findViewById<Button>(R.id.btnResetLearnedWords)
 
         flashcardsButton.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -29,5 +35,37 @@ class MainMenuActivity : AppCompatActivity() {
             val intent = Intent(this, QuizActivity::class.java)
             startActivity(intent)
         }
+
+        resetButton.setOnClickListener {
+            // Burada tüm kelimelerin learningLevel değerini 0 yapacak bir fonksiyon çağırılabilir.
+            resetLearnedWords()
+        }
+    }
+
+    private fun resetLearnedWords() {
+        // words.json dosyasındaki tüm kelimelerin learningLevel değerini 0 yap
+        val words = loadWords()
+        words.forEach { it.learningLevel = 0 }
+        saveWords(words)
+    }
+
+    private fun loadWords(): List<Word> {
+        // words.json dosyasından kelimeleri yükle
+        val jsonString: String
+        try {
+            jsonString = assets.open("words.json").bufferedReader().use { it.readText() }
+        } catch (ioException: IOException) {
+            ioException.printStackTrace()
+            return emptyList()
+        }
+        val listType = object : TypeToken<List<Word>>() {}.type
+        return Gson().fromJson(jsonString, listType)
+    }
+
+    private fun saveWords(words: List<Word>) {
+        // Tüm kelimeleri güncel JSON olarak kaydet
+        val file = File(filesDir, "words.json")
+        val updatedJsonString = Gson().toJson(words)
+        FileWriter(file).use { it.write(updatedJsonString) }
     }
 }

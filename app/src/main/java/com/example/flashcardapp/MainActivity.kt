@@ -1,6 +1,7 @@
 package com.example.flashcardapp
 
 import android.os.Bundle
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
@@ -15,6 +16,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var words: MutableList<Word>
     private lateinit var adapter: CardsAdapter
+    private lateinit var ivReturn: ImageView
+    private lateinit var ivCheck: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +31,15 @@ class MainActivity : AppCompatActivity() {
         val frame = findViewById<SwipeFlingAdapterView>(R.id.frame)
         frame.adapter = adapter
 
+        ivReturn = findViewById(R.id.ivReturn)
+        ivCheck = findViewById(R.id.ivCheck)
+
         frame.setFlingListener(object : SwipeFlingAdapterView.onFlingListener {
             override fun removeFirstObjectInAdapter() {
                 if (words.isNotEmpty()) {
                     words.removeAt(0)
                     adapter.notifyDataSetChanged()
-                }
+                }else reloadWords()
             }
 
             override fun onLeftCardExit(dataObject: Any) {
@@ -47,7 +53,17 @@ class MainActivity : AppCompatActivity() {
                 saveWord(filesDir, word)
             }
             override fun onAdapterAboutToEmpty(itemsInAdapter: Int) {}
-            override fun onScroll(scrollProgressPercent: Float) {}
+            override fun onScroll(scrollProgressPercent: Float) {
+                val alpha = Math.abs(scrollProgressPercent)
+                if (scrollProgressPercent < 0) {
+                    ivReturn.alpha = alpha
+                    ivCheck.alpha = 0f
+                } else {
+                    ivReturn.alpha = 0f
+                    ivCheck.alpha = alpha
+                }
+            }
+
         })
 
         frame.setOnItemClickListener { _, _ ->
@@ -57,6 +73,12 @@ class MainActivity : AppCompatActivity() {
             tvWord.text = if (tvWord.text == word.english) word.turkish else word.english
         }
 
+    }
+    private fun reloadWords() {
+        words.clear()
+        words.addAll(loadWords())
+        words.shuffle(Random(System.currentTimeMillis()))
+        adapter.notifyDataSetChanged()
     }
     private fun copyAssets() {
         val assetManager = assets
